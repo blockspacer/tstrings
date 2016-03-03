@@ -1,0 +1,37 @@
+cmake_minimum_required (VERSION 2.8.11)
+
+include (CTest)
+include ("${CMAKE_MODULE_PATH}/DownloadProject.cmake")
+
+if (CMAKE_VERSION VERSION_LESS 3.2)
+    set (UPDATE_DISCONNECTED_IF_AVAILABLE "")
+else ()
+    set (UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
+endif ()
+
+# download GoogleTest targets
+download_project (
+	PROJ            googletest
+	GIT_REPOSITORY  https://github.com/google/googletest.git
+	GIT_TAG         master
+	${UPDATE_DISCONNECTED_IF_AVAILABLE}
+)
+
+# Prevent GoogleTest from overriding our compiler/linker options
+# when building with Visual Studio
+set (gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+# setup unit test libraries
+add_subdirectory (${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+
+# main test suite
+add_executable (tstrings_cpp_test 
+	"tstrings_cpp/interpolate.cpp"
+)
+target_link_libraries (tstrings_cpp_test 
+	tstrings_cpp 
+	gtest 
+	gmock_main
+)
+
+add_test (NAME full_test_suite COMMAND tstrings_cpp_test)

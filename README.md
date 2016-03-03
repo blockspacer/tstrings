@@ -1,21 +1,36 @@
-# c++ template strings.
+# tstrings: c++ template strings
 
-A header-only set of c++ utilities for performing simple string interpolation similar to ES6 template strings/literals.
+A tiny header-only set of c++ utilities for performing string interpolation similar to ES6 template strings/literals.
 
 ## Examples
 
 #### std::string interpolation
 
     // the template
-    const string templ = "The quick ${color} fox."
+    const string templ = "The quick ${color} fox.";
 
     // variables
-    const unordered_map<string, string>& vars = {
+    const std::unordered_map<string, string> vars = {
         { "color", "brown" }
     };
 
     // interpolate and print to std out
     cout << tstrings::interpolate_braces(templ, vars);
+
+#### numeric interpolation
+
+    // the template
+    const string templ = "The ${0} ${1} fox.";
+
+    // variables
+    const std::vector<string> vars = { "quick", "brown" };
+
+    // interpolate and print to std out
+    cout << tstrings::interpolate_braces(templ, vars);
+
+#### interpolate a stream
+
+    TODO
 
 ## Requirements
 

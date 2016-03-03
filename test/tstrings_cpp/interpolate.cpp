@@ -24,19 +24,19 @@ namespace templates
 
 TEST(tstrings, interpolate_empty)
 {
-    const std::unordered_map<string, string>& vars = {};
+    const std::unordered_map<string, string> vars = {};
     EXPECT_EQ("", tstrings::interpolate_braces<string>("", vars));
 }
 
 TEST(tstrings, interpolate_no_vars)
 {
-    const std::unordered_map<string, string>& vars = {};
+    const std::unordered_map<string, string> vars = {};
     EXPECT_EQ(templates::no_vars, tstrings::interpolate_braces(templates::no_vars, vars));
 }
 
 TEST(tstrings, interpolate)
 {
-    const std::unordered_map<string, string>& vars = {
+    const std::unordered_map<string, string> vars = {
         { "color", "brown" }
     };
 
@@ -48,7 +48,7 @@ TEST(tstrings, interpolate)
 
 TEST(tstrings, interpolate_utf8)
 {
-    const std::unordered_map<string, string>& vars = {
+    const std::unordered_map<string, string> vars = {
         { u8"воасл", u8"brʘwn" }
     };
 
@@ -60,7 +60,7 @@ TEST(tstrings, interpolate_utf8)
 
 TEST(tstrings, interpolate_wstr)
 {
-    const std::unordered_map<wstring, wstring>& vars = {
+    const std::unordered_map<wstring, wstring> vars = {
         { L"cȌlor", L"brʘwn" }
     };
 
@@ -72,7 +72,7 @@ TEST(tstrings, interpolate_wstr)
 
 TEST(tstrings, interpolate_numeric_map)
 {
-    const std::unordered_map<string, string>& vars = {
+    const std::unordered_map<string, string> vars = {
         { "0", "quick" },
         { "1", "brown" }
     };
@@ -99,7 +99,7 @@ TEST(tstrings, interpolate_numeric)
 
 TEST(tstrings, interpolate_empty_variable)
 {
-    const std::unordered_map<string, string>& vars = {
+    const std::unordered_map<string, string> vars = {
         { "color", "" }
     };
 
@@ -111,7 +111,7 @@ TEST(tstrings, interpolate_empty_variable)
 
 TEST(tstrings, interpolate_with_whitespace)
 {
-    const std::unordered_map<string, string>& vars = {
+    const std::unordered_map<string, string> vars = {
         { "color", "brown" }
     };
 

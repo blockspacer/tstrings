@@ -5,6 +5,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <fstream>
 
 using std::string;
 using std::wstring;
@@ -20,6 +21,17 @@ namespace templates
     const string fox_numeric = "The ${0} ${1} fox.";
     const string fox_numeric_invalid = "The ${123} ${456} ${abcd} fox.";
     const wstring fox_wstr   = L"The quiĉk ${cȌlor} fox.";
+}
+
+namespace strings
+{
+    const string tqbf = "The quick brown fox.";
+}
+
+namespace files
+{
+    const string small_utf8 = "data/small_utf8.template";
+    const string small_utf8_expect = "data/small_utf8.expected";
 }
 
 TEST(tstrings, interpolate_empty)
@@ -41,7 +53,7 @@ TEST(tstrings, interpolate)
     };
 
     EXPECT_EQ(
-        "The quick brown fox.", 
+        strings::tqbf, 
         tstrings::interpolate_braces(templates::fox, vars)
     );
 }
@@ -78,7 +90,7 @@ TEST(tstrings, interpolate_numeric_map)
     };
 
     EXPECT_EQ(
-        "The quick brown fox.", 
+        strings::tqbf, 
         tstrings::interpolate_braces(templates::fox_numeric, vars)
     );
 }
@@ -87,7 +99,7 @@ TEST(tstrings, interpolate_numeric)
 {
     const std::vector<string> vars { "quick", "brown" };
     EXPECT_EQ(
-        "The quick brown fox.", 
+        strings::tqbf, 
         tstrings::interpolate_braces(templates::fox_numeric, vars)
     );
 
@@ -116,7 +128,66 @@ TEST(tstrings, interpolate_with_whitespace)
     };
 
     EXPECT_EQ(
-        "The quick brown fox.", 
+        strings::tqbf, 
         tstrings::interpolate_braces(templates::fox_spaces, vars)
     );
+}
+
+TEST(tstrings, interpolate_stream_small)
+{
+    const std::unordered_map<string, string> vars = {
+        { "color", "brown" }
+    };
+
+    std::stringstream output;
+    // returns an output stream writing to `output`
+    auto out = tstrings::interpolate_braces(vars, output);
+
+    // wrap the streambuf in a ostream
+    out << templates::fox << std::flush;
+
+    EXPECT_EQ(
+        strings::tqbf,
+        output.str()
+    );
+}
+
+TEST(tstrings, interpolate_stream_file)
+{
+    const std::unordered_map<string, string> vars = {
+        { "color", "brown" },
+        { "animal", "fox" },
+        { "dog", "dalmatian" },
+    };
+
+    std::stringstream output;
+    {
+        std::ifstream template_file(files::small_utf8);
+        if (template_file) {
+            // read the entire file to the output stream
+            tstrings::interpolate_braces(vars, output) 
+                << template_file.rdbuf() 
+                << std::flush;
+        } 
+        else {
+            FAIL() << "file '" <<  files::small_utf8 << "' not open";
+        }
+    }
+
+    // test the result
+    std::ifstream expected_file(files::small_utf8_expect);
+    if (expected_file)
+    {
+        // simple equality test
+        if (!std::equal(std::istreambuf_iterator<char>(output), 
+                std::istreambuf_iterator<char>(), 
+                std::istreambuf_iterator<char>(expected_file))) {
+
+            output.seekg(0);
+            FAIL() << "files not identical after interpolation:\n" << output.rdbuf();
+        }
+    }
+    else {
+        FAIL() << "file '" <<  files::small_utf8_expect << "' not open";
+    }
 }

@@ -65,13 +65,16 @@ namespace tstrings
 
     /* ---------------------------------------------------- */
 
+    template<
+        typename Ch
+        >
     class otstream final
         : public std::ostream
     {
-        std::unique_ptr<std::streambuf> buf_;
+        std::unique_ptr<std::basic_streambuf<Ch>> buf_;
 
     public:
-        otstream(std::unique_ptr<std::streambuf>&& ptr)
+        otstream(std::unique_ptr<std::basic_streambuf<Ch>>&& ptr)
             : std::ostream(ptr.get())
             , buf_{ std::move(ptr) } {
         }
@@ -79,16 +82,17 @@ namespace tstrings
         otstream(otstream&& other)
             : buf_{ std::move(other.buf_) } {
         }
-
-        virtual ~otstream() {}
     };
 
     /* ---------------------------------------------------- */
 
-    inline otstream
+    template <
+        typename Str = std::string
+        >
+    inline otstream<typename Str::value_type>
     interpolate_braces(
-        const std::unordered_map<std::string, std::string>& vars,
-        std::ostream& sink
+        const std::unordered_map<Str, Str>& vars,
+        std::basic_ostream<typename Str::value_type>& sink
         );
 }
 

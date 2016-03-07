@@ -318,21 +318,26 @@ namespace tstrings
 
     /* ---------------------------------------------------- */
 
-    inline otstream
+    template<
+        typename Str
+        >
+    inline otstream<typename Str::value_type>
     interpolate_braces(
-        const std::unordered_map<std::string, std::string>& vars,
+        const std::unordered_map<Str, Str>& vars,
         std::ostream& sink
         )
     {
-        auto fn = [&vars](const std::string& var_name, std::basic_ostream<char>& buff) {
+        using Ch = typename Str::value_type;
+
+        auto fn = [&vars](const Str& var_name, std::basic_ostream<Ch>& buff) {
             auto val = vars.find(var_name);
             if (val != std::end(vars)) {
                 buff << (val->second);
             }
         };
 
-        return otstream(std::unique_ptr<std::streambuf>(
-            new detail::templ_streambuf<char, decltype(fn), 256>(sink, fn)
+        return otstream<Ch>(std::unique_ptr<std::streambuf>(
+            new detail::templ_streambuf<Ch, decltype(fn), 256>(sink, fn)
         ));
     }
 }

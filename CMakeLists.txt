@@ -5,7 +5,7 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 set (tgt tstrings_cpp)
 
-project (${tgt})
+project (${tgt} C CXX)
 
 # cmake options
 option ("${tgt}_WITH_TESTS" "Enable unit tests" OFF)
@@ -14,13 +14,13 @@ option ("${tgt}_WITH_TESTS" "Enable unit tests" OFF)
 set (${tgt}_VERSION_MAJOR 0)
 set (${tgt}_VERSION_MINOR 1)
 
-# src files
 set (SRC
-    src/${tgt}/lib.cpp
+    # header-only
 )
 
 # create the library
 add_library (${tgt} STATIC ${SRC})
+set_target_properties(${tgt} PROPERTIES LINKER_LANGUAGE CXX)
 
 # Turn on all warnings when using gcc.
 if (CMAKE_COMPILER_IS_GNUCXX)

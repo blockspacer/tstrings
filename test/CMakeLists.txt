@@ -34,8 +34,11 @@ target_link_libraries (tstrings_cpp_test
 	gmock_main
 )
 
-add_test (NAME full_test_suite COMMAND tstrings_cpp_test)
-
-add_custom_target(copy-test-files ALL
+add_test (
+	NAME full_test_suite 
+	COMMAND tstrings_cpp_test
+)
+add_custom_target (copy-test-files ALL
     COMMAND cmake -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data
-    DEPENDS ${MY_TARGET})
+    DEPENDS ${MY_TARGET}
+)

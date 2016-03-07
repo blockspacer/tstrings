@@ -50,10 +50,10 @@ namespace tstrings
         typename Tr = std::char_traits<Ch>,
         typename Alloc = std::allocator<Ch>
         >
-    std::basic_string<Ch, Tr, Alloc>
-    inline interpolate_by_regex(
+    inline void interpolate_by_regex(
         const std::basic_string<Ch, Tr, Alloc>& tstr,
         const std::basic_regex<Ch>& reg_exp,
+        std::basic_ostream<Ch>& sink,
         Fn& fun
         )
     {
@@ -61,7 +61,6 @@ namespace tstrings
         using RegexIt = std::regex_iterator<It, Ch>;
 
         RegexIt rit(std::begin(tstr), std::end(tstr), reg_exp), rend;
-        std::basic_string<Ch, Tr, Alloc> result;
 
         /* iterate over all matches */
         int64_t idx = 0;
@@ -71,19 +70,19 @@ namespace tstrings
             auto start_idx = m.position(0);
             auto len = m.length(0);
 
-            result.append(tstr, idx, start_idx - idx);
+            //result.append(tstr, idx, start_idx - idx);
+            sink.write(&tstr[idx], start_idx - idx);
 
             /* interpolate */
             const auto& var_name = m[1];
             if (var_name.length() > 0) {
-                fun(var_name, result);
+                fun(var_name, sink);
             }
 
             idx = start_idx + len;
             ++rit;
         }
-        result.append(tstr, idx, tstr.size() - idx);
-        return result;
+        sink.write(&tstr[idx], tstr.size() - idx);
     }
 
     /* ---------------------------------------------------- */
@@ -99,16 +98,20 @@ namespace tstrings
     {
         using Ch = typename Str::value_type;
 
-        auto fn = [&vars](const Str& var_name, Str& buff) {
+        auto fn = [&vars](const Str& var_name, std::basic_ostream<Ch>& buff) {
             auto val = vars.find(var_name);
             if (val != std::end(vars)) {
-                buff.append(val->second);
+                buff << val->second;
             }
         };
 
-        return interpolate_by_regex(tstring,
+        std::basic_ostringstream<Ch> result;
+        interpolate_by_regex(tstring,
             detail::get_regex<Ch>(),
+            result,
             fn);
+
+        return result.str();
     }
 
     /* ---------------------------------------------------- */
@@ -124,7 +127,7 @@ namespace tstrings
     {
         using Ch = typename Str::value_type;
 
-        auto fn = [&vars](const Str& var_name, Str& buff) {
+        auto fn = [&vars](const Str& var_name, std::basic_ostream<Ch>& buff) {
             unsigned idx = 0u;
             try {
                 idx = stoul(var_name);
@@ -133,15 +136,17 @@ namespace tstrings
             catch (std::out_of_range) { return; }
 
             if (idx < vars.size()) {
-                buff.append(vars[idx]);
+                buff << (vars[idx]);
             }
         };
 
-        Str result;
-
-        return interpolate_by_regex(tstring,
+        std::basic_ostringstream<Ch> result;
+        interpolate_by_regex(tstring,
             detail::get_regex<Ch>(),
+            result,
             fn);
+
+        return result.str();
     }
 
     /* ---------------------------------------------------- */
@@ -253,13 +258,10 @@ namespace tstrings
                 if (buf[n - 1] == TOK::tail &&
                     buf[n - 2] != TOK::escape_sequence)
                 {
-                    auto str = interpolate_by_regex(buf,
+                    interpolate_by_regex(buf,
                         detail::get_regex<Ch>(),
+                        sink_,
                         resolve_);
-
-                    if (str.length() > 0) {
-                        sink_.write(str.data(), str.length());
-                    }
 
                     buf.clear();
                     return true;
@@ -369,10 +371,10 @@ namespace tstrings
         std::ostream& sink
         )
     {
-        auto fn = [&vars](const std::string& var_name, std::string& buff) {
+        auto fn = [&vars](const std::string& var_name, std::basic_ostream<char>& buff) {
             auto val = vars.find(var_name);
             if (val != std::end(vars)) {
-                buff.append(val->second);
+                buff << (val->second);
             }
         };
 

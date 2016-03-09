@@ -5,6 +5,7 @@ compiler:
 - gcc
 os:
 - linux
+before_install: apt-get install --only-upgrade cmake
 script:
   - mkdir build_tests && cd build_tests
   - cmake .. -Dtstrings_cpp_WITH_TESTS:BOOL=on

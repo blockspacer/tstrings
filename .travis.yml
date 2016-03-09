@@ -1,0 +1,16 @@
+language: cpp
+compiler:
+- clang
+- gcc
+os:
+- linux
+script:
+  - mkdir build_tests && cd build_tests
+  - cmake .. -Dtstrings_cpp_WITH_TESTS:BOOL=on
+  - cmake --build . --config Debug
+after_success:
+  - cd test
+  - ctest . -VV -C Debug
+branches:
+  only:
+  - master

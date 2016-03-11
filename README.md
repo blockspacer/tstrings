@@ -1,4 +1,5 @@
 # tstrings: c++ template strings
+![build](https://travis-ci.org/rayglover/tstrings.svg?branch=master)
 
 Header-only utilities for performing simple string interpolation; compatible with [ES6 template strings/literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) (but without arbitrary expression evaluation).
 
@@ -75,7 +76,7 @@ $ ctest . -VV -C Debug
 
 ## use in your own project
 
-If you're using cmake, it should be straight forward to use tstrings in your own project. Once you have run the build, the package `tstrings_cpp` will become availble via the `find_package` command. Here is a minimal example:
+If you're using cmake, it should be straight-forward to use tstrings in your own project. Once you've run the build, the package `tstrings_cpp` will become availble via the `find_package` command in your project. Here is a minimal example:
 
 ```cmake
 # CMakeLists.txt

@@ -53,7 +53,7 @@ tstrings::interpolate_braces(vars, std::cout)
 
 ## Requirements
 
-- cmake `>= 2.8.4`
+- cmake `>= 2.8.12`
 - A c++11 compatible compiler
 
 ## Tests
@@ -62,7 +62,6 @@ To run the tests, first configure with the cmake option `tstrings_cpp_WITH_TESTS
 
 ```cmake
 $ mkdir build_tests && cd build_tests
-
 $ cmake .. -G "Visual Studio 12 2013 Win64" \
     -Dtstrings_cpp_WITH_TESTS:BOOL=on
 ```
@@ -71,6 +70,19 @@ $ cmake .. -G "Visual Studio 12 2013 Win64" \
 
 ```cmake
 $ cd test && cmake --build .. --config Debug
-
 $ ctest . -VV -C Debug
+```
+
+## use in your own project
+
+If you're using cmake, it should be straight forward to use tstrings in your own project. Once you have run the build, the package `tstrings_cpp` will become availble via the `find_package` command. Here is a minimal example:
+
+```cmake
+# CMakeLists.txt
+project (demo)
+add_definitions ("--std=c++11")
+
+find_package (tstrings_cpp)
+add_executable (demo main.cpp)
+target_link_libraries (demo tstrings_cpp)
 ```

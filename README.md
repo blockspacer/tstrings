@@ -1,5 +1,5 @@
 # tstrings: c++ template strings
-![build](https://travis-ci.org/rayglover/tstrings.svg?branch=master)
+[![Build Status](https://travis-ci.org/rayglover/tstrings.svg?branch=master)](https://travis-ci.org/rayglover/tstrings)
 
 Header-only utilities for performing simple string interpolation; compatible with [ES6 template strings/literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) (but without arbitrary expression evaluation).
 

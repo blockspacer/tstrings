@@ -203,7 +203,7 @@ void interp_and_compare_files (
     }
 }
 
-TEST(tstrings, interpolate_stream_file_utf8)
+TEST(tstrings, interpolate_stream_file_ascii)
 {
     const std::unordered_map<string, string> vars = {
         { "color", "brown" },
@@ -220,7 +220,11 @@ TEST(tstrings, interpolate_stream_file_utf8)
         vars);
 }
 
-TEST(tstrings, interpolate_stream_file_utf16)
+/** 
+ * Reads a template file as UF8, converts characters 
+ * to wchar_t's, then interpolates.
+ */
+TEST(tstrings, interpolate_stream_file_utf8)
 {
     const std::unordered_map<wstring, wstring> vars = {
         { L"color", L"brown" },

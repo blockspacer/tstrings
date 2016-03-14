@@ -142,6 +142,14 @@ namespace tstrings
             static const char tail = '}';
         };
 
+        template<>
+        struct brace_tokens<wchar_t> {
+            static const wchar_t escape_sequence = L'\\';
+            static const wchar_t delimiter = L'$';
+            static const wchar_t head = L'{';
+            static const wchar_t tail = L'}';
+        };
+
         template<
             typename Ch,
             typename Fn,
@@ -170,11 +178,11 @@ namespace tstrings
                 templ_streambuf(const templ_streambuf &);
                 templ_streambuf &operator= (const templ_streambuf &);
 
-                std::ostream &sink_;
+                std::basic_ostream<Ch> &sink_;
                 Fn resolve_;
 
                 std::array<Ch, LEN+1> buffer_;
-                std::string lookahead_;
+                std::basic_string<Ch> lookahead_;
                 Ch prev_;
 
                 // indicates whether the parser is
@@ -196,7 +204,7 @@ namespace tstrings
             , region_(false)
         {
             sink_.clear();
-            char *base = &buffer_.front();
+            Ch *base = &buffer_.front();
             base::setp(base, base + buffer_.size() - 1); // -1 to make overflow() easier
         }
 
@@ -276,7 +284,7 @@ namespace tstrings
                 prev_ = *p;
             }
 
-            if (n > 0) sink_.write(flush_start, n);
+            if (n > 0) { sink_.write(flush_start, n); }
 
             {
                 std::ptrdiff_t n = base::pptr() - base::pbase();
@@ -304,7 +312,7 @@ namespace tstrings
         templ_streambuf<Ch, Fn, LEN>::overflow(templ_streambuf<Ch, Fn, LEN>::int_type ch)
         {
             if (sink_ && ch != base::traits_type::eof()) {
-                assert(std::less_equal<char *>()(base::pptr(), base::epptr()));
+                assert(std::less_equal<Ch *>()(base::pptr(), base::epptr()));
 
                 *base::pptr() = ch;
                 base::pbump(1);
@@ -324,7 +332,7 @@ namespace tstrings
     inline otstream<typename Str::value_type>
     interpolate_braces(
         const std::unordered_map<Str, Str>& vars,
-        std::ostream& sink
+        std::basic_ostream<typename Str::value_type>& sink
         )
     {
         using Ch = typename Str::value_type;
@@ -336,7 +344,7 @@ namespace tstrings
             }
         };
 
-        return otstream<Ch>(std::unique_ptr<std::streambuf>(
+        return otstream<Ch>(std::unique_ptr<std::basic_streambuf<Ch>>(
             new detail::templ_streambuf<Ch, decltype(fn), 256>(sink, fn)
         ));
     }

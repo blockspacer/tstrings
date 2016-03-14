@@ -69,13 +69,13 @@ namespace tstrings
         typename Ch
         >
     class otstream final
-        : public std::ostream
+        : public std::basic_ostream<Ch>
     {
         std::unique_ptr<std::basic_streambuf<Ch>> buf_;
 
     public:
         otstream(std::unique_ptr<std::basic_streambuf<Ch>>&& ptr)
-            : std::ostream(ptr.get())
+            : std::basic_ostream<Ch>(ptr.get())
             , buf_{ std::move(ptr) } {
         }
 

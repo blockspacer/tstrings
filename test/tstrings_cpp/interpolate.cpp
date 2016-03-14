@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include <fstream>
+#include <locale>
 
 using std::string;
 using std::wstring;
@@ -32,6 +33,9 @@ namespace files
 {
     const string small_utf8 = "data/small_utf8.template";
     const string small_utf8_expect = "data/small_utf8.expected";
+
+    const string small_utf16 = "data/small_utf16.template";
+    const string small_utf16_expect = "data/small_utf16.expected";
 }
 
 TEST(tstrings, interpolate_empty)
@@ -53,7 +57,7 @@ TEST(tstrings, interpolate)
     };
 
     EXPECT_EQ(
-        strings::tqbf, 
+        strings::tqbf,
         tstrings::interpolate_braces(templates::fox, vars)
     );
 }
@@ -65,7 +69,7 @@ TEST(tstrings, interpolate_utf8)
     };
 
     EXPECT_EQ(
-        u8"The quiĉk brʘwn fox.", 
+        u8"The quiĉk brʘwn fox.",
         tstrings::interpolate_braces(templates::fox_utf8, vars)
     );
 }
@@ -77,7 +81,7 @@ TEST(tstrings, interpolate_wstr)
     };
 
     EXPECT_EQ(
-        L"The quiĉk brʘwn fox.", 
+        L"The quiĉk brʘwn fox.",
         tstrings::interpolate_braces<wstring>(templates::fox_wstr, vars)
     );
 }
@@ -90,7 +94,7 @@ TEST(tstrings, interpolate_numeric_map)
     };
 
     EXPECT_EQ(
-        strings::tqbf, 
+        strings::tqbf,
         tstrings::interpolate_braces(templates::fox_numeric, vars)
     );
 }
@@ -99,12 +103,12 @@ TEST(tstrings, interpolate_numeric)
 {
     const std::vector<string> vars { "quick", "brown" };
     EXPECT_EQ(
-        strings::tqbf, 
+        strings::tqbf,
         tstrings::interpolate_braces(templates::fox_numeric, vars)
     );
 
     EXPECT_EQ(
-        "The    fox.", 
+        "The    fox.",
         tstrings::interpolate_braces(templates::fox_numeric_invalid, vars)
     );
 }
@@ -128,7 +132,7 @@ TEST(tstrings, interpolate_with_whitespace)
     };
 
     EXPECT_EQ(
-        strings::tqbf, 
+        strings::tqbf,
         tstrings::interpolate_braces(templates::fox_spaces, vars)
     );
 }
@@ -152,7 +156,54 @@ TEST(tstrings, interpolate_stream_small)
     );
 }
 
-TEST(tstrings, interpolate_stream_file)
+template<typename Ch>
+void interp_and_compare_files (
+    std::basic_ifstream<Ch>& template_file,
+    std::basic_ifstream<Ch>& expect_file,
+    std::unordered_map<
+        std::basic_string<Ch>,
+        std::basic_string<Ch>
+    > vars)
+{
+    std::basic_stringstream<Ch> output;
+    {
+        if (template_file) {
+            // read the entire file to the output stream
+            tstrings::interpolate_braces(vars, output)
+                << template_file.rdbuf()
+                << std::flush;
+        }
+        else {
+            FAIL() << "file not open";
+        }
+    }
+
+    // test the result
+    if (expect_file)
+    {
+        // simple equality test
+        if (!std::equal(std::istreambuf_iterator<Ch>(output),
+                std::istreambuf_iterator<Ch>(),
+                std::istreambuf_iterator<Ch>(expect_file)))
+        {
+            FAIL() << "files not identical after interpolation:\n" << output.str();
+        }
+
+        // check streams are same length
+        expect_file.seekg(0, std::ios::end);
+        output.seekg(0, std::ios::end);
+
+        // note: use .gcount(), not tellg(), because we
+        // want to compare the number of characters, not bytes;
+        EXPECT_EQ(expect_file.gcount(), output.gcount())
+            << "files are not the same length";
+    }
+    else {
+        FAIL() << "file not open";
+    }
+}
+
+TEST(tstrings, interpolate_stream_file_utf8)
 {
     const std::unordered_map<string, string> vars = {
         { "color", "brown" },
@@ -160,34 +211,40 @@ TEST(tstrings, interpolate_stream_file)
         { "dog", "dalmatian" },
     };
 
-    std::stringstream output;
-    {
-        std::ifstream template_file(files::small_utf8);
-        if (template_file) {
-            // read the entire file to the output stream
-            tstrings::interpolate_braces(vars, output) 
-                << template_file.rdbuf() 
-                << std::flush;
-        } 
-        else {
-            FAIL() << "file '" <<  files::small_utf8 << "' not open";
-        }
-    }
+    std::ifstream template_file(files::small_utf8, std::ios::binary);
+    std::ifstream expect_file(files::small_utf8_expect, std::ios::binary);
 
-    // test the result
-    std::ifstream expected_file(files::small_utf8_expect);
-    if (expected_file)
-    {
-        // simple equality test
-        if (!std::equal(std::istreambuf_iterator<char>(output), 
-                std::istreambuf_iterator<char>(), 
-                std::istreambuf_iterator<char>(expected_file))) {
+    interp_and_compare_files(
+        template_file,
+        expect_file,
+        vars);
+}
 
-            output.seekg(0);
-            FAIL() << "files not identical after interpolation:\n" << output.rdbuf();
-        }
-    }
-    else {
-        FAIL() << "file '" <<  files::small_utf8_expect << "' not open";
-    }
+TEST(tstrings, interpolate_stream_file_utf16)
+{
+    const std::unordered_map<wstring, wstring> vars = {
+        { L"color", L"brown" },
+        { L"animal", L"fox" },
+        { L"dog", L"dalmatian" },
+    };
+
+    std::wifstream template_file(files::small_utf8, std::ios::binary);
+    std::wifstream expect_file(files::small_utf8_expect, std::ios::binary);
+
+    template_file.imbue(
+        std::locale(
+            std::locale(""),
+            new std::codecvt_utf8<wchar_t>)
+        );
+
+    expect_file.imbue(
+        std::locale(
+            std::locale(""),
+            new std::codecvt_utf8<wchar_t>)
+        );
+
+    interp_and_compare_files<wchar_t>(
+        template_file,
+        expect_file,
+        vars);
 }

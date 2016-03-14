@@ -237,14 +237,14 @@ TEST(tstrings, interpolate_stream_file_utf8)
 
     template_file.imbue(
         std::locale(
-            std::locale(""),
-            new std::codecvt_utf8<wchar_t>)
+            template_file.getloc(),
+            new std::codecvt_utf8_utf16<char16_t>)
         );
 
     expect_file.imbue(
         std::locale(
-            std::locale(""),
-            new std::codecvt_utf8<wchar_t>)
+            template_file.getloc(),
+            new std::codecvt_utf8_utf16<char16_t>)
         );
 
     interp_and_compare_files<wchar_t>(

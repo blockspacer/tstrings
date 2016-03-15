@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <memory>
 #include <array>
+#include <functional>
 
 namespace tstrings
 {

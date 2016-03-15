@@ -8,6 +8,10 @@
 #include <fstream>
 #include <locale>
 
+#if (!defined(_MSC_VER) || _MSC_VER > 1800 /* VS 2013 */ )
+	#define u8_literals
+#endif
+
 using std::string;
 using std::wstring;
 using std::u16string;
@@ -17,11 +21,15 @@ namespace templates
 {
     const string no_vars     = "Hello World!";
     const string fox         = "The quick ${color} fox.";
-    const string fox_utf8    = u8"The quiĉk ${воасл} fox.";
     const string fox_spaces  = "The quick ${ color } fox.";
     const string fox_numeric = "The ${0} ${1} fox.";
     const string fox_numeric_invalid = "The ${123} ${456} ${abcd} fox.";
     const wstring fox_wstr   = L"The quiĉk ${cȌlor} fox.";
+
+#if defined(u8_literals)
+	const string fox_utf8 = u8"The quiĉk ${воасл} fox.";
+#endif
+
 }
 
 namespace strings
@@ -62,6 +70,7 @@ TEST(tstrings, interpolate)
     );
 }
 
+#if defined(u8_literals)
 TEST(tstrings, interpolate_utf8)
 {
     const std::unordered_map<string, string> vars = {
@@ -73,6 +82,7 @@ TEST(tstrings, interpolate_utf8)
         tstrings::interpolate_braces(templates::fox_utf8, vars)
     );
 }
+#endif
 
 TEST(tstrings, interpolate_wstr)
 {

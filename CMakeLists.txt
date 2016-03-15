@@ -14,7 +14,9 @@ set (${tgt}_VERSION_MAJOR 0)
 set (${tgt}_VERSION_MINOR 1)
 
 set (SRC
-    # header-only
+    # header-only (use dummy lib.cpp to make older 
+	# versions of cmake produce a .lib on windows)
+	src/lib.cpp
 )
 
 # create the library

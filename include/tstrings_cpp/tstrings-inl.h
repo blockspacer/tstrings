@@ -288,7 +288,7 @@ namespace tstrings
 
             {
                 std::ptrdiff_t n = base::pptr() - base::pbase();
-                base::pbump(-n);
+                base::pbump((int)-n);
             }
 
             return sink_.good();
@@ -309,7 +309,9 @@ namespace tstrings
             std::size_t LEN
             >
         typename templ_streambuf<Ch, Fn, LEN>::int_type
-        templ_streambuf<Ch, Fn, LEN>::overflow(templ_streambuf<Ch, Fn, LEN>::int_type ch)
+        templ_streambuf<Ch, Fn, LEN>::overflow(
+			typename templ_streambuf<Ch, Fn, LEN>::int_type ch
+			)
         {
             if (sink_ && ch != base::traits_type::eof()) {
                 assert(std::less_equal<Ch *>()(base::pptr(), base::epptr()));

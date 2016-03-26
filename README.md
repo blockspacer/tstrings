@@ -74,9 +74,15 @@ $ cd test && cmake --build .. --config Debug
 $ ctest . -VV -C Debug
 ```
 
-## use in your own project
+## Use in your own projects
 
-If you're using cmake, it should be straight-forward to use tstrings in your own project. Once you've run the build, the package `tstrings_cpp` will become availble via the `find_package` command in your project. Here is a minimal example:
+If you're using cmake, it should be straight-forward to use tstrings in your own project. Once you've run the build, make the package `tstrings_cpp` available to other projects:
+
+```cmake
+$ cmake --install .
+```
+
+Other projects can now find `tstrings_cpp` via the `find_package` command. Here is a minimal example of what another project's `CMakeLists.txt` could look like:
 
 ```cmake
 # CMakeLists.txt

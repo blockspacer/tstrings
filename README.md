@@ -76,7 +76,7 @@ $ ctest . -VV -C Debug
 
 ## Use in your own projects
 
-If you're using cmake, it should be straight-forward to use tstrings in your own project. Once you've run the build, make the package `tstrings_cpp` available to other projects:
+If you're using cmake, it should be straight-forward to use tstrings in your own project. To make the package `tstrings_cpp` available to other projects on your system:
 
 ```cmake
 $ cmake --install .
@@ -93,3 +93,5 @@ find_package (tstrings_cpp)
 add_executable (demo main.cpp)
 target_link_libraries (demo tstrings_cpp)
 ```
+
+Alternatively, you can just add the `tstrings/include` path as an include directory to your project. 

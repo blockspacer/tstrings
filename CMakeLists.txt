@@ -14,7 +14,7 @@ set (${tgt}_VERSION_MAJOR 0)
 set (${tgt}_VERSION_MINOR 1)
 
 set (SRC
-    # header-only (use dummy lib.cpp to make older 
+    # header-only (use dummy lib.cpp to make older
     # versions of cmake produce a .lib on windows)
     src/lib.cpp
 )
@@ -36,7 +36,7 @@ target_include_directories (${tgt}
 
 # Add all targets to the build-tree export set
 export (TARGETS ${tgt}
-	FILE "${PROJECT_BINARY_DIR}/${tgt}Targets.cmake"
+    FILE "${PROJECT_BINARY_DIR}/${tgt}Targets.cmake"
 )
 
 # Export the package for use from the build-tree
@@ -45,7 +45,7 @@ export (PACKAGE ${tgt})
 
 # Create the <pkg>Config.cmake and <pkg>ConfigVersion files
 configure_file (cmake/${tgt}Config.cmake.in
-	"${PROJECT_BINARY_DIR}/${tgt}Config.cmake" @ONLY
+    "${PROJECT_BINARY_DIR}/${tgt}Config.cmake" @ONLY
 )
 
 # unit tests

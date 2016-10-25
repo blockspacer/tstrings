@@ -43,7 +43,6 @@ namespace tstrings
             auto start_idx = m.position(0);
             auto len = m.length(0);
 
-            //result.append(tstr, idx, start_idx - idx);
             sink.write(&tstr[idx], start_idx - idx);
 
             /* interpolate */
@@ -166,17 +165,15 @@ namespace tstrings
             public:
                 explicit templ_streambuf(std::basic_ostream<Ch> &sink, Fn resolve);
 
+                templ_streambuf(const templ_streambuf &) = delete;
+                templ_streambuf &operator= (const templ_streambuf &) = delete;
+
             private:
                 bool scan();
                 bool parse_and_resolve(const Ch* ch);
 
                 int_type overflow(int_type ch) override;
                 int sync() override;
-
-                // copy ctor and assignment not implemented;
-                // copying not allowed
-                templ_streambuf(const templ_streambuf &);
-                templ_streambuf &operator= (const templ_streambuf &);
 
                 std::basic_ostream<Ch> &sink_;
                 Fn resolve_;
@@ -188,7 +185,6 @@ namespace tstrings
                 // indicates whether the parser is
                 // in an interpolated region
                 bool region_;
-
         };
 
         template<
@@ -285,12 +281,10 @@ namespace tstrings
             }
 
             if (n > 0) { sink_.write(flush_start, n); }
-
             {
                 std::ptrdiff_t n = base::pptr() - base::pbase();
                 base::pbump((int)-n);
             }
-
             return sink_.good();
         }
 
@@ -319,8 +313,7 @@ namespace tstrings
                 *base::pptr() = ch;
                 base::pbump(1);
 
-                if (scan())
-                    return ch;
+                if (scan()) { return ch; }
             }
             return base::traits_type::eof();
         }
@@ -347,7 +340,7 @@ namespace tstrings
         };
 
         return otstream<Ch>(std::unique_ptr<std::basic_streambuf<Ch>>(
-            new detail::templ_streambuf<Ch, decltype(fn), 256>(sink, fn)
+            new detail::templ_streambuf<Ch, decltype(fn), 256>(sink, std::move(fn))
         ));
     }
 }

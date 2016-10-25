@@ -39,10 +39,10 @@ namespace strings
 
 namespace files
 {
-    const string small_utf8 = "data/small_utf8.template";
+    const string small_utf8        = "data/small_utf8.template";
     const string small_utf8_expect = "data/small_utf8.expected";
 
-    const string small_utf16 = "data/small_utf16.template";
+    const string small_utf16        = "data/small_utf16.template";
     const string small_utf16_expect = "data/small_utf16.expected";
 }
 
@@ -166,17 +166,17 @@ TEST(tstrings, interpolate_stream_small)
     );
 }
 
-template<typename Ch>
-void interp_and_compare_files (
-    std::basic_ifstream<Ch>& template_file,
-    std::basic_ifstream<Ch>& expect_file,
-    std::unordered_map<
-        std::basic_string<Ch>,
-        std::basic_string<Ch>
-    > vars)
-{
-    std::basic_stringstream<Ch> output;
+namespace {
+    template<typename Ch>
+    void interp_and_compare_files (
+        std::basic_ifstream<Ch>& template_file,
+        std::basic_ifstream<Ch>& expect_file,
+        std::unordered_map<
+            std::basic_string<Ch>,
+            std::basic_string<Ch>
+        > vars)
     {
+        std::basic_stringstream<Ch> output;
         if (template_file) {
             // read the entire file to the output stream
             tstrings::interpolate_braces(vars, output)
@@ -186,39 +186,40 @@ void interp_and_compare_files (
         else {
             FAIL() << "file not open";
         }
-    }
 
-    // test the result
-    if (expect_file)
-    {
-        // simple equality test
-        if (!std::equal(std::istreambuf_iterator<Ch>(output),
-                std::istreambuf_iterator<Ch>(),
-                std::istreambuf_iterator<Ch>(expect_file)))
+        // test the result
+        if (expect_file)
         {
-            FAIL() << "files not identical after interpolation:\n" << output.str();
+            // simple equality test
+            if (!std::equal(
+                    std::istreambuf_iterator<Ch>(output),
+                    std::istreambuf_iterator<Ch>(),
+                    std::istreambuf_iterator<Ch>(expect_file)))
+            {
+                FAIL() << "files not identical after interpolation:\n" << output.str();
+            }
+
+            // check streams are same length
+            expect_file.seekg(0, std::ios::end);
+            output.seekg(0, std::ios::end);
+
+            // note: use .gcount(), not tellg(), because we
+            // want to compare the number of characters, not bytes;
+            EXPECT_EQ(expect_file.gcount(), output.gcount())
+                << "files are not the same length";
         }
-
-        // check streams are same length
-        expect_file.seekg(0, std::ios::end);
-        output.seekg(0, std::ios::end);
-
-        // note: use .gcount(), not tellg(), because we
-        // want to compare the number of characters, not bytes;
-        EXPECT_EQ(expect_file.gcount(), output.gcount())
-            << "files are not the same length";
-    }
-    else {
-        FAIL() << "file not open";
+        else {
+            FAIL() << "file not open";
+        }
     }
 }
 
 TEST(tstrings, interpolate_stream_file_ascii)
 {
     const std::unordered_map<string, string> vars = {
-        { "color", "brown" },
+        { "color",  "brown" },
         { "animal", "fox" },
-        { "dog", "dalmatian" },
+        { "dog",    "dalmatian" },
     };
 
     std::ifstream template_file(files::small_utf8, std::ios::binary);
@@ -229,7 +230,6 @@ TEST(tstrings, interpolate_stream_file_ascii)
         expect_file,
         vars);
 }
-
 
 namespace {
 #if _MSC_VER == 1900
@@ -250,9 +250,9 @@ namespace {
 TEST(tstrings, interpolate_stream_file_utf8)
 {
     const std::unordered_map<wstring, wstring> vars = {
-        { L"color", L"brown" },
+        { L"color",  L"brown" },
         { L"animal", L"fox" },
-        { L"dog", L"dalmatian" },
+        { L"dog",    L"dalmatian" },
     };
 
     std::wifstream template_file(files::small_utf8, std::ios::binary);
@@ -273,5 +273,6 @@ TEST(tstrings, interpolate_stream_file_utf8)
     interp_and_compare_files<wchar_t>(
         template_file,
         expect_file,
-        vars);
+        vars
+        );
 }

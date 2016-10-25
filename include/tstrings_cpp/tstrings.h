@@ -64,8 +64,9 @@ namespace tstrings
         const std::vector<Str>& vars
         );
 
-    /* ---------------------------------------------------- */
-
+    /**
+     *  Represents in interpolated stream
+     */
     template<
         typename Ch
         >
@@ -85,8 +86,9 @@ namespace tstrings
         }
     };
 
-    /* ---------------------------------------------------- */
-
+    /**
+     *  Interpolate an input stream
+     */
     template <
         typename Str = std::string
         >
@@ -97,5 +99,5 @@ namespace tstrings
         );
 }
 
-// definitions
+/* definitions */
 #include "tstrings-inl.h"

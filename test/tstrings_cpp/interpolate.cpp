@@ -230,6 +230,19 @@ TEST(tstrings, interpolate_stream_file_ascii)
         vars);
 }
 
+
+namespace {
+#if _MSC_VER == 1900
+    /* codecvt_utf8_utf16 is buggy in MSVC 2015; 
+          see: 'https://connect.microsoft.com/VisualStudio/feedback/details/1403302/
+                unresolved-external-when-using-codecvt-utf8'
+    */
+    using Elem = unsigned short;
+#else
+    using Elem = char16_t;
+#endif
+}
+
 /** 
  * Reads a template file as UF8, converts characters 
  * to wchar_t's, then interpolates.
@@ -248,13 +261,13 @@ TEST(tstrings, interpolate_stream_file_utf8)
     template_file.imbue(
         std::locale(
             template_file.getloc(),
-            new std::codecvt_utf8_utf16<char16_t>)
+            new std::codecvt_utf8_utf16<Elem>)
         );
 
     expect_file.imbue(
         std::locale(
-            template_file.getloc(),
-            new std::codecvt_utf8_utf16<char16_t>)
+            expect_file.getloc(),
+            new std::codecvt_utf8_utf16<Elem>)
         );
 
     interp_and_compare_files<wchar_t>(

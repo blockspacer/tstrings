@@ -24,18 +24,23 @@ set (gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 # setup unit test libraries
 add_subdirectory (${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 
+# Turn on all warnings when using gcc.
+if (CMAKE_COMPILER_IS_GNUCXX)
+   add_definitions ("--std=c++11 -W -Wall -pedantic")
+endif ()
+
 # main test suite
-add_executable (tstrings_cpp_test 
+add_executable (tstrings_cpp_test
 	"tstrings_cpp/interpolate.cpp"
 )
-target_link_libraries (tstrings_cpp_test 
-	tstrings_cpp 
-	gtest 
+target_link_libraries (tstrings_cpp_test
+	tstrings_cpp
+	gtest
 	gmock_main
 )
 
 add_test (
-	NAME full_test_suite 
+	NAME full_test_suite
 	COMMAND tstrings_cpp_test
 )
 add_custom_target (copy-test-files ALL

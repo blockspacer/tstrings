@@ -304,8 +304,8 @@ namespace tstrings
             >
         typename templ_streambuf<Ch, Fn, LEN>::int_type
         templ_streambuf<Ch, Fn, LEN>::overflow(
-			typename templ_streambuf<Ch, Fn, LEN>::int_type ch
-			)
+            typename templ_streambuf<Ch, Fn, LEN>::int_type ch
+            )
         {
             if (sink_ && ch != base::traits_type::eof()) {
                 assert(std::less_equal<Ch *>()(base::pptr(), base::epptr()));

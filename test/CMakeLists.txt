@@ -11,10 +11,10 @@ endif ()
 
 # download GoogleTest targets
 download_project (
-	PROJ            googletest
-	GIT_REPOSITORY  https://github.com/google/googletest.git
-	GIT_TAG         master
-	${UPDATE_DISCONNECTED_IF_AVAILABLE}
+    PROJ            googletest
+    GIT_REPOSITORY  https://github.com/google/googletest.git
+    GIT_TAG         master
+    ${UPDATE_DISCONNECTED_IF_AVAILABLE}
 )
 
 # Prevent GoogleTest from overriding our compiler/linker options
@@ -31,19 +31,18 @@ endif ()
 
 # main test suite
 add_executable (tstrings_cpp_test
-	"tstrings_cpp/interpolate.cpp"
+    "tstrings_cpp/interpolate.cpp"
 )
 target_link_libraries (tstrings_cpp_test
-	tstrings_cpp
-	gtest
-	gmock_main
+    tstrings_cpp
+    gtest
+    gmock_main
 )
 
 add_test (
-	NAME full_test_suite
-	COMMAND tstrings_cpp_test
+    NAME full_test_suite
+    COMMAND tstrings_cpp_test
 )
 add_custom_target (copy-test-files ALL
     COMMAND cmake -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data
-    DEPENDS ${MY_TARGET}
 )
